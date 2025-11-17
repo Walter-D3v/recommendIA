@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 Asistente de Regalos Navideños</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f3d0f;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a5a1a;
+            border: 3px solid #fbbf24;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            font-size: 1rem;
+            width: 150px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #dc2626;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover {
+            background: #b91c1c;
+        }
+
+        .btn-remove {
+            background: #991b1b;
+            color: white;
+            padding: 8px 16px;
+        }
+
+        .btn-remove:hover {
+            background: #7f1d1d;
+        }
+
+        .btn-recommend {
+            width: 100%;
+            background: #dc2626;
+            color: white;
+            font-size: 1.2rem;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .btn-recommend:hover {
+            background: #b91c1c;
+        }
+
+        .person-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #166534;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .person-card input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .person-card select {
+            padding: 10px;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: white;
+            min-width: 150px;
+        }
+
+        #peopleList {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎁 Asistente de Regalos Navideños</h1>
+
+        <!-- Presupuesto -->
+        <div class="input-group">
+            <label>Tu presupuesto:</label>
+            <input type="number" id="budget" value="1" min="1">
+        </div>
+
+        <!-- Número de personas -->
+        <div class="input-group">
+            <label>Personas a las que vas a regalar:</label>
+            <input type="number" id="peopleCount" value="1" min="1">
+        </div>
+
+        <!-- Botón agregar persona -->
+        <button class="btn btn-add" onclick="addPerson()">🎅 Agregar persona</button>
+
+        <!-- Lista de personas -->
+        <div id="peopleList"></div>
+
+        <!-- Botón de recomendaciones -->
+        <button class="btn btn-recommend" onclick="getRecommendations()">🎄 Obtener recomendaciones</button>
+    </div>
+
+    <script>
+        const mockCategories = [
+            "Tecnología",
+            "Hogar",
+            "Ropa",
+            "Accesorios",
+            "Juguetes",
+            "Electrónica",
+            "Libros",
+            "Cocina",
+            "Belleza",
+            "Deportes",
+            "Gaming",
+            "Oficina",
+            "Aromaterapia",
+            "Viajes",
+            "Mascotas"
+        ];
+
+        let people = [];
+
+        function addPerson() {
+            const person = {
+                id: Date.now(),
+                name: "",
+                category: "Tecnología"
+            };
+            people.push(person);
+            renderPeople();
+        }
+
+        function removePerson(id) {
+            people = people.filter(p => p.id !== id);
+            renderPeople();
+        }
+
+        function updatePerson(id, field, value) {
+            const person = people.find(p => p.id === id);
+            if (person) {
+                person[field] = value;
+            }
+        }
+
+        function renderPeople() {
+            const container = document.getElementById('peopleList');
+            container.innerHTML = '';
+
+            people.forEach(person => {
+                const card = document.createElement('div');
+                card.className = 'person-card';
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.placeholder = 'Nombre';
+                nameInput.value = person.name;
+                nameInput.oninput = (e) => updatePerson(person.id, 'name', e.target.value);
+
+                const categorySelect = document.createElement('select');
+                categorySelect.value = person.category;
+                categorySelect.onchange = (e) => updatePerson(person.id, 'category', e.target.value);
+                
+                mockCategories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    if (cat === person.category) {
+                        option.selected = true;
+                    }
+                    categorySelect.appendChild(option);
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn btn-remove';
+                removeBtn.textContent = '✖';
+                removeBtn.onclick = () => removePerson(person.id);
+
+                card.appendChild(nameInput);
+                card.appendChild(categorySelect);
+                card.appendChild(removeBtn);
+                container.appendChild(card);
+            });
+        }
+
+        function getRecommendations() {
+            const budget = document.getElementById('budget').value;
+            const peopleCount = document.getElementById('peopleCount').value;
+            
+            if (people.length === 0) {
+                alert('¡Agrega al menos una persona para obtener recomendaciones! 🎅');
+                return;
+            }
+
+            alert(`Buscando regalos para ${people.length} persona(s) con un presupuesto de $${budget}... 🎄`);
+        }
+    </script>
+</body>
+</html>
